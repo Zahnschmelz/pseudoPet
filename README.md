@@ -14,6 +14,13 @@ A retro-style Tamagotchi clone built with Python and Pygame. Designed to run on 
 - **Retro Aesthetics**: Pixel-art style with custom fonts and sound effects.
 - **Cross-Platform**: Optimized for Linux/Windows/macOS and Android.
 
+## 📸 Screenshots
+
+| | |
+| :---: | :---: |
+| ![Demo 1](screenshots/demo01.png) | ![Demo 2](screenshots/demo02.png) |
+| ![Demo 3](screenshots/demo03.png) | ![Demo 4](screenshots/demo04.png) |
+
 ## 🚀 Quickstart (Linux/macOS)
 
 The fastest way to get running:
