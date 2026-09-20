@@ -27,3 +27,4 @@ Thumbs.db
 # Project specific
 .bak
 .test
+bak_*
