@@ -28,3 +28,6 @@ Thumbs.db
 .bak
 .test
 bak_*
+*_bak.py
+.gitignore
+fix_*
