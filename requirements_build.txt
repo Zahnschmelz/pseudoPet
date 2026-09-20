@@ -1,0 +1,9 @@
+buildozer
+python-for-android
+cython
+pygame
+websockets
+kivy
+plyer
+pyjnius
+dbus-python

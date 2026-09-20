@@ -1,0 +1,6 @@
+pygame
+websockets
+kivy
+plyer
+pyjnius
+dbus-python

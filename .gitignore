@@ -1,0 +1,29 @@
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Virtual Environments
+venv/
+.venv/
+env/
+
+# Android / Buildozer
+.buildozer/
+bin/
+*.apk
+*.aab
+
+# Secrets & Local Data
+*.keystore
+*.jks
+pseudopet_save.json
+*.log
+
+# OS specific
+.DS_Store
+Thumbs.db
+
+# Project specific
+.bak
+.test
