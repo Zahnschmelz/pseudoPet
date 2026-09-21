@@ -1,5 +1,15 @@
 # PseudoPet 🐾
 
+<p align="center">
+<img src="pseudopet.png" alt="PseudoPet Banner" width="600">
+</p>
+
+<p align="center">
+<i>Eat. Sleep. Evolve!</i>
+</p>
+
+---
+
 A retro-style Tamagotchi clone built with Python and Pygame. Designed to run on Desktop and be portable to Android via Buildozer.
 
 ## ✨ Features
