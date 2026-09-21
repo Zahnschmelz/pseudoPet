@@ -24,10 +24,11 @@ STATE_SICK = "sick"
 STATE_DEAD = "dead"
 STATE_GHOST = "ghost"
 STATE_HATCHING = "hatching"
-OFFLINE_MERCY = 0.19    # offline multipier
+OFFLINE_MERCY = 0.14    # offline multipier
 OFFLINE_MAX = 24 * 3600 # 24h
-OFFLINE_MIN_REPORT = 15.0   # Report erst ab dieser Abwesenheit anzeigen (sec)
-OFFLINE_DT_MIN     = 7.0   # darunter: normaler Ruckler, kein Offline-Pfad (sec)
+OFFLINE_MIN_REPORT = 3.0   # Report erst ab dieser Abwesenheit anzeigen (sec)
+OFFLINE_DT_MIN     = 2.0   # darunter: normaler Ruckler, kein Offline-Pfad (sec)
+AUTOSAVE_INTERVAL = 3.0
 
 # ============================================================
 # SPIEL-BALANCE — zentral einstellbar
