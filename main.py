@@ -117,7 +117,7 @@ if LANG != "de":
     NOTIF_HEADLINE = NOTIF_HEADLINE_EN
 
 SAVE_FILE = path + "pseudopet_save.json"
-AUTOSAVE_INTERVAL = 10.0
+
 HATCH_TIME = max(3, int(180 / DEBUG_SPEED))
 BABY_TIME = max(3, int(3600 / DEBUG_SPEED))
 CHILD_TIME = max(3, int(10800 / DEBUG_SPEED))
@@ -870,6 +870,8 @@ class _SleepGuardSound(pygame.mixer.Sound):
 
 class Game:
     def __init__(self):
+        self._pending_offline_seconds = 0.0
+        self._last_frame_wall = time.time()
         self._alarm_refresh_t = 0.0
         self._last_notif_time = 0.0
         self._in_background = False
@@ -1090,35 +1092,131 @@ class Game:
     def _enter_background(self):
         if self._in_background:
             return
+
         self._in_background = True
         print("[lifecycle] -> Hintergrund")
+
+        now = time.time()
+
+        # Abwesenheit beginnt JETZT
+        self._away_since = now
+        self._bg_since = now
+
+        # Falls noch eine alte pending Simulation existiert: zurücksetzen
+        self._pending_offline_seconds = 0.0
+
+        # Musik optional pausieren
+        try:
+            if self.music_on:
+                pygame.mixer.music.pause()
+        except Exception:
+            pass
+
         if self.pet:
-            if self._away_since is None:
-                self._away_since = time.time()
-            self._bg_since = time.time()
+            # Wichtig: Save enthält away_since, falls Android den Prozess killt
             self.save()
+
+            # Alarme für Hintergrund planen
             self._schedule_evolve_warning()
-            self._schedule_need_warning()      # prüft Cooldown intern
+            self._schedule_need_warning()
             self._schedule_death_warning()
+
             if self._should_notify():
                 reason = self._pet_need_reason()
                 if reason:
                     msg = self._need_message(reason)
                     if self._notify(self._notif_title(), msg):
-                        self._last_notif_time = time.time()  # ← nur bei echtem Senden
+                        self._last_notif_time = time.time()
 
     def _enter_foreground(self):
         if not self._in_background:
             return
+
         self._in_background = False
         print("[lifecycle] -> Vordergrund")
-        self._away_since = None
+
+        now = time.time()
+
+        # Wichtig: NICHT sofort _away_since löschen, erst die Lücke berechnen
+        start = (
+            self._away_since
+            or self._bg_since
+            or getattr(self, "_last_frame_wall", now)
+        )
+
+        gap = max(0.0, now - start) if start else 0.0
+
+        # Alte Hintergrund-Alarme direkt canceln
         self._cancel_pet_alarm()
+
+        # Offline-Simulation für den Hauptloop vormerken.
+        # Wenn du wirklich JEDEN Foreground simulieren willst, lass gap > 0.0 so stehen.
+        # Falls du nur "echte" Abwesenheit willst, ändere es auf:
+        # if gap > OFFLINE_DT_MIN and self.pet ...
+        if gap > 0.0 and self.pet and self.pet.state not in (STATE_DEAD, STATE_GHOST):
+            self._pending_offline_seconds = min(gap, OFFLINE_MAX)
+        else:
+            self._pending_offline_seconds = 0.0
+
+        # Jetzt können die Zeitstempel zurückgesetzt werden
+        self._away_since = None
+        self._bg_since = None
+
+        # Musik wieder aktivieren
         try:
             if self.music_on:
                 pygame.mixer.music.unpause()
         except Exception:
             pass
+
+        # Cooldown zurücksetzen, wenn lange genug weg
+        if gap >= NOTIF_COOLDOWN:
+            self._last_notif_time = 0.0
+            print(f"[notif] Cooldown zurückgesetzt (bg {gap:.0f}s)")
+
+        # Android-Notification-Permission neu prüfen
+        if platform() == "android":
+            try:
+                from android.permissions import check_permission
+                self.notif_permitted = check_permission(
+                    "android.permission.POST_NOTIFICATIONS"
+                )
+            except Exception:
+                self.notif_permitted = True
+
+    def _apply_offline_report(self, gap):
+        """
+        Führt eine Offline-Simulation für die übergebene Zeit aus und zeigt
+        anschließend den Offline-Report an, wenn die Abwesenheit lang genug war.
+        """
+        if gap <= 0.0:
+            return
+
+        if not self.pet or self.pet.state in (STATE_DEAD, STATE_GHOST):
+            return
+
+        # Minigame nach längerer Abwesenheit nicht einfach "halb" weiterlaufen lassen
+        if self.mode == "minigame":
+            self.minigame = None
+            self.mode = "game"
+
+        # Sicherstellen, dass Outdoor/World-Referenzen für die Simulation korrekt sind
+        self.world.apply_effects(self.pet, 0.0)
+
+        report = self.pet.simulate_offline(gap)
+        report["secs"] = min(gap, OFFLINE_MAX)
+        report["hours"] = round(report["secs"] / 3600.0, 1)
+
+        self.offline_report = report
+
+        if report["secs"] >= OFFLINE_MIN_REPORT:
+            self.mode = "offline"
+
+        if gap >= NOTIF_COOLDOWN:
+            self._last_notif_time = 0.0
+
+        self._away_since = None
+        self.save()
 
         # --- Cooldown-Logik ---
         if self._bg_since is not None:
@@ -3179,10 +3277,14 @@ class Game:
             "| WINDOWFOCUSLOST:", getattr(pygame, "WINDOWFOCUSLOST", None))
 
         while running:
-            dt = self.clock.tick(FPS) / 1000.0
+            raw_dt = self.clock.tick(FPS) / 1000.0
             frame += 1
-            if frame <= 2 or dt > 5.0:
-                dt = min(dt, 1.0 / FPS)      # Startup/Resume: kein Live-Mega-dt
+            self._last_frame_wall = time.time()
+
+            if frame <= 2 or raw_dt > 5.0:
+                dt = min(raw_dt, 1.0 / FPS)      # Startup/Resume: kein Live-Mega-dt
+            else:
+                dt = raw_dt
             if frame % 200 == 0:
                 print(f"[loop] f{frame} active={pygame.display.get_active()} bg={self._in_background}")
             for event in pygame.event.get():
@@ -3251,20 +3353,21 @@ class Game:
                     running = False
             else:
                 self._quit_hold_t = 0.0
-            if dt > OFFLINE_DT_MIN and frame > 2:
-                if self.pet and self.pet.state not in (STATE_DEAD, STATE_GHOST):
-                    report = self.pet.simulate_offline(dt)     # Zustand: nur der echte Gap
-                    if self._away_since is not None:
-                        total = min(time.time() - self._away_since, OFFLINE_MAX)
-                        report["secs"] = total                 # Report: volle Abwesenheit
-                        report["hours"] = round(total / 3600, 1)
-                    self.offline_report = report
-                    if report["secs"] >= OFFLINE_MIN_REPORT:   # kein Popup bei Mini-Gaps
-                        self.mode = "offline"
-                    self._away_since = None
-                    self.save()
-                dt = 0.1
-            elif dt > OFFLINE_DT_MIN:
+            pending = getattr(self, "_pending_offline_seconds", 0.0)
+            self._pending_offline_seconds = 0.0
+
+            offline_gap = pending
+
+            # Fallback für Fälle ohne Lifecycle-Event, z. B. Suspended/Debugger/Frame-Gap
+            if frame > 2 and raw_dt > OFFLINE_DT_MIN:
+                offline_gap = max(offline_gap, raw_dt)
+
+            # Offline-Simulation ausführen.
+            # pending > 0.0 sorgt dafür, dass auch kurze Foreground-Rückkehr simuliert wird.
+            # Wenn du nur echte Abwesenheit willst, nutze:
+            # if offline_gap > OFFLINE_DT_MIN:
+            if offline_gap > OFFLINE_DT_MIN or pending > 0.0:
+                self._apply_offline_report(offline_gap)
                 dt = 0.1
             self.fly_t += dt
             self.world._in_minigame = (self.mode == "minigame")
