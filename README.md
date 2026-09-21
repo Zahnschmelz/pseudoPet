@@ -1,7 +1,7 @@
 # PseudoPet 🐾
 
 <p align="center">
-<img src="pseudopet.png" alt="PseudoPet Banner" width="600">
+<img src="pseudopet.png" alt="PseudoPet Banner" width="300">
 </p>
 
 <p align="center">

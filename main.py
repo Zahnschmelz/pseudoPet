@@ -814,7 +814,7 @@ class World:
                     self.shooting_star = {
                         "x": -20 ,
                         "y": (15 + random.uniform(0, 45)) ,
-                        "vx": (140 + random.uniform(0, 60)) ,
+                        "vx": (125 + random.uniform(0, 50)) ,
                         "vy": (30 + random.uniform(0, 25)) ,
                     }
                     if (self.star_sound is not None
