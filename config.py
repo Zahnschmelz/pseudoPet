@@ -24,11 +24,11 @@ STATE_SICK = "sick"
 STATE_DEAD = "dead"
 STATE_GHOST = "ghost"
 STATE_HATCHING = "hatching"
-OFFLINE_MERCY = 0.14    # offline multipier
-OFFLINE_MAX = 24 * 3600 # 24h
+OFFLINE_MERCY = 0.05    # offline multipier
+OFFLINE_MAX = 18 * 3600 # 24h
 OFFLINE_MIN_REPORT = 3.0   # Report erst ab dieser Abwesenheit anzeigen (sec)
 OFFLINE_DT_MIN     = 2.0   # darunter: normaler Ruckler, kein Offline-Pfad (sec)
-AUTOSAVE_INTERVAL = 3.0
+AUTOSAVE_INTERVAL = 5.0
 
 # ============================================================
 # SPIEL-BALANCE — zentral einstellbar
@@ -57,28 +57,28 @@ HEAL_RATE_SLEEP      = 0.25     # +HP/s schlafend & unglücklich
 HEAL_RATE_SLEEP_HAPPY= 0.45     # +HP/s schlafend & glücklich
 
 # --- Gefahren ---
-STARVE_HUNGER        = 77.0     # ab hier (hunger > X) verliert das Pet Gesundheit
-EXHAUST_ENERGY       = 20.0     # darunter: Health-Verlust UND Krankheits-Risiko
-HEALTH_DECAY_CRITICAL= 0.18     # HP-Verlust/s bei Verhungern/Erschöpfung; 100 HP -> 0 in ~9 min
+STARVE_HUNGER        = 81.0     # ab hier (hunger > X) verliert das Pet Gesundheit
+EXHAUST_ENERGY       = 15.0     # darunter: Health-Verlust UND Krankheits-Risiko
+HEALTH_DECAY_CRITICAL= 0.1     # HP-Verlust/s bei Verhungern/Erschöpfung; 100 HP -> 0 in ~9 min
 POOP_HEALTH_DECAY    = 0.05     # HP-Verlust/s pro gewertetem Haufen...
 POOP_HEALTH_CAP      = 3        # ...maximal so viele Haufen zählen (nur für HP)
-POOP_HAPPINESS_DECAY = 0.15     # Glücksverlust/s pro Haufen (alle, ungecapped)
+POOP_HAPPINESS_DECAY = 0.13     # Glücksverlust/s pro Haufen (alle, ungecapped)
 SICK_ENERGY          = 20.0     # unter dieser Energie wird das Pet anfällig
 SICK_CHANCE          = 0.012    # ~1% pro Sekunde, solange Energie darunter
 SICK_HEALTH_DECAY    = 0.055    # HP-Verlust/s solange krank
 SICK_HAPPINESS_DECAY = 0.05     # Glücksverlust/s solange krank
 # --- Outdoor-Krankheit (Regen) ---
-OUTDOOR_SICK_INTERVAL = 17.0   # s Outdoor-Regen bis zum naechsten Wurf
-OUTDOOR_SICK_CHANCE   = 0.05   # Chance pro Wurf (3 %)
-SNOW_SICK_INTERVAL    = 15.0   # s Outdoor-Schnee bis zum naechsten Wurf
-SNOW_SICK_CHANCE      = 0.07   # Chance pro Wurf (7 %)
+OUTDOOR_SICK_INTERVAL = 19.0   # s Outdoor-Regen bis zum naechsten Wurf
+OUTDOOR_SICK_CHANCE   = 0.03   # Chance pro Wurf (3 %)
+SNOW_SICK_INTERVAL    = 17.0   # s Outdoor-Schnee bis zum naechsten Wurf
+SNOW_SICK_CHANCE      = 0.05   # Chance pro Wurf (5 %)
 
-OFFLINE_HEALTH_FLOOR = 14.0     # offline stirbt das Pet NICHT: HP -> 10 + wird krank
-GHOST_TIME           = 12.0     # Sekunden als Geist, dann endgültig DEAD (Save wird gelöscht)
+OFFLINE_HEALTH_FLOOR = 15.0     # offline stirbt das Pet NICHT: HP -> 15 + wird krank
+GHOST_TIME           = 10.0     # Sekunden als Geist, dann endgültig DEAD (Save wird gelöscht)
 
 # --- Poop ---
 POOP_TIMER_GATE      = 150.0    # Poop-Uhr läuft erst X s, bevor die Spawn-Chance startet
-POOP_CHANCE          = 0.023    # Spawn-Chance pro s (2.3%) nach dem Gate
+POOP_CHANCE          = 0.02    # Spawn-Chance pro s (2%) nach dem Gate
 POOP_MAX             = 12       # maximal so viele Haufen gleichzeitig (werden gezeichnet)
 POOP_WAIT_EXPECTED   = 1.0 / POOP_CHANCE # ~40s Erwartungswert
 
@@ -98,7 +98,7 @@ DEATH_WARN_LEAD      = 300      # 5 min vor kritischem Zustand
 DEATH_WARN_MIN       = 60       # Todes-Warnung nie früher als X s geplant (Anti-Spam)
 DEATH_WARN_WINDOW    = 1800.0   # nur planen, wenn Tod < 30 min droht
 NEED_ALARM_MIN       = 10       # Mindest-Delay Need-Alarm (ersetzt das max(10, ...))
-OFFLINE_CHUNK        = 10.0     # Sim-Schritt in simulate_offline
+OFFLINE_CHUNK        = 30.0     # Sim-Schritt in simulate_offline
 NOTIF_COOLDOWN       = 300.0    # 5 min: Mindestabstand fuer Need-Notifications
 
 # --- Notification-Ruhezeit (_should_notify) ---
