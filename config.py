@@ -24,8 +24,8 @@ STATE_SICK = "sick"
 STATE_DEAD = "dead"
 STATE_GHOST = "ghost"
 STATE_HATCHING = "hatching"
-OFFLINE_MERCY = 0.05    # offline multipier
-OFFLINE_MAX = 18 * 3600 # 24h
+OFFLINE_MERCY = 0.01    # offline multipier
+OFFLINE_MAX = 18 * 3600 # 18h
 OFFLINE_MIN_REPORT = 3.0   # Report erst ab dieser Abwesenheit anzeigen (sec)
 OFFLINE_DT_MIN     = 2.0   # darunter: normaler Ruckler, kein Offline-Pfad (sec)
 AUTOSAVE_INTERVAL = 5.0
@@ -38,14 +38,14 @@ AUTOSAVE_INTERVAL = 5.0
 
 # --- Grund-Raten ---
 HUNGER_DECAY_WAKE    = 0.1      # Hunger-Wert steigt pro s (wach); 0 -> 77 dauert ~13 min
-HUNGER_DECAY_SLEEP   = 0.04     # Hunger-Zuwachs im Schlaf (wirkt OHNE Offline-Mercy!)
-HAPPINESS_DECAY      = 0.08     # Glück sinkt pro s (wach); 100 -> 30 dauert ~15 min
-ENERGY_DECAY_WAKE    = 0.06     # Energie sinkt pro s (wach); 100 -> 20 dauert ~22 min
+HUNGER_DECAY_SLEEP   = 0.03     # Hunger-Zuwachs im Schlaf (wirkt OHNE Offline-Mercy!)
+HAPPINESS_DECAY      = 0.07     # Glück sinkt pro s (wach); 100 -> 30 dauert ~15 min
+ENERGY_DECAY_WAKE    = 0.05     # Energie sinkt pro s (wach); 100 -> 20 dauert ~22 min
 ENERGY_REGEN_SLEEP   = 0.25     # Energie WÄCHST im Schlaf (kein Decay!)
-DISCIPLINE_DECAY     = 0.03     # Disziplin schwindet pro s; Ermahnung gibt +20
+DISCIPLINE_DECAY     = 0.02     # Disziplin schwindet pro s; Ermahnung gibt +20
 OVERFEED_THRESHOLD   = 25.0
 OVERFEED_SICK_THRESHOLD = 5.0
-OVERFEED_SICK_CHANCE = 0.10
+OVERFEED_SICK_CHANCE = 0.08
 
 # --- Heilung --- # Heilt nur, wenn: NICHT krank UND hunger < HEAL_HUNGER_MAX UND energy > HEAL_ENERGY_MIN
 HEAL_HUNGER_MAX      = 50.0     # Regeneration nur solange Hunger DARUNTER
@@ -58,7 +58,7 @@ HEAL_RATE_SLEEP_HAPPY= 0.45     # +HP/s schlafend & glücklich
 
 # --- Gefahren ---
 STARVE_HUNGER        = 81.0     # ab hier (hunger > X) verliert das Pet Gesundheit
-EXHAUST_ENERGY       = 15.0     # darunter: Health-Verlust UND Krankheits-Risiko
+EXHAUST_ENERGY       = 12.0     # darunter: Health-Verlust UND Krankheits-Risiko
 HEALTH_DECAY_CRITICAL= 0.1     # HP-Verlust/s bei Verhungern/Erschöpfung; 100 HP -> 0 in ~9 min
 POOP_HEALTH_DECAY    = 0.05     # HP-Verlust/s pro gewertetem Haufen...
 POOP_HEALTH_CAP      = 3        # ...maximal so viele Haufen zählen (nur für HP)
