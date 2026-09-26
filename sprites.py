@@ -355,11 +355,11 @@ SPRITES = {
     ],
     "leaf_premium": [
         r"..X....X....X..",
-        r".XX..XXXX..XX..",
+        r".XX..XXXXX..XX.",
         r".XXXXXXXXXXXXX.",
         r"XXX.XXXXXXX.XXX",
         r"XXXXXXXXXXXXXXX",
-        r"XXXX..X.X..XXXX",
+        r"XXXX..XXX..XXXX",
         r"XXXXXXXXXXXXXXX",
         r"XXXXX.XXX.XXXXX",
         r".XXXXXXXXXXXXX.",
