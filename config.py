@@ -24,7 +24,7 @@ STATE_SICK = "sick"
 STATE_DEAD = "dead"
 STATE_GHOST = "ghost"
 STATE_HATCHING = "hatching"
-OFFLINE_MERCY = 0.01    # offline multipier
+OFFLINE_MERCY = 0.015    # offline multipier
 OFFLINE_MAX = 18 * 3600 # 18h
 OFFLINE_MIN_REPORT = 3.0   # Report erst ab dieser Abwesenheit anzeigen (sec)
 OFFLINE_DT_MIN     = 2.0   # darunter: normaler Ruckler, kein Offline-Pfad (sec)
@@ -112,9 +112,9 @@ ALARM_SLOT_NEED      = 4244     # nächstes Bedürfnis
 
 # --- Tageszeit ---
 HOUR_DAY_START       = 7        # 07:00 -> Tag
-HOUR_DAY_END         = 18       # 18:00 -> Abenddunkel
+HOUR_DAY_END         = 19       # 18:00 -> Abenddunkel
 HOUR_NIGHT_START     = 20       # 20:00 -> Nacht
-HOUR_NIGHT_END       = 5        # 05:00 -> Morgendunkel
+HOUR_NIGHT_END       = 6        # 05:00 -> Morgendunkel
 
 HATCH_CHOICES = {
     "dot":    ("spike", "flame"),
@@ -372,8 +372,8 @@ NOTIF_HEADLINE = NOTIF_HEADLINE_DE
 STAGE_STABILITY = {
     STAGE_EGG:     0.00,   # Ei: kein Bonus
     STAGE_BABY:    0.00,   # Baby: volle Pflege noetig
-    STAGE_CHILD:   0.04,   # Child:  5 % stabiler
-    STAGE_TEEN:    0.06,   # Teen:   9 % stabiler
-    STAGE_ADULT:   0.08,   # Adult: 12 % stabiler
-    STAGE_PREMIUM: 0.10,   # Premium: 15 % stabiler
+    STAGE_CHILD:   0.03,   # Child:  5 % stabiler
+    STAGE_TEEN:    0.05,   # Teen:   9 % stabiler
+    STAGE_ADULT:   0.07,   # Adult: 12 % stabiler
+    STAGE_PREMIUM: 0.09,   # Premium: 15 % stabiler
 }

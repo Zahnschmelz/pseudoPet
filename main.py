@@ -119,9 +119,9 @@ if LANG != "de":
 SAVE_FILE = path + "pseudopet_save.json"
 
 HATCH_TIME = max(3, int(180 / DEBUG_SPEED))
-BABY_TIME = max(3, int(3600 / DEBUG_SPEED))
-CHILD_TIME = max(3, int(10800 / DEBUG_SPEED))
-TEEN_TIME = max(3, int(28800 / DEBUG_SPEED))
+BABY_TIME = max(3, int(7200 / DEBUG_SPEED))
+CHILD_TIME = max(3, int(14400 / DEBUG_SPEED))
+TEEN_TIME = max(3, int(43200 / DEBUG_SPEED))
 HATCH_ANIM_SPEED = 4 if DEBUG_SPEED > 1 else 1
 
 HOLD_KEYS = {
@@ -1131,50 +1131,38 @@ class Game:
     def _enter_foreground(self):
         if not self._in_background:
             return
-
         self._in_background = False
         print("[lifecycle] -> Vordergrund")
-
         now = time.time()
 
-        # Wichtig: NICHT sofort _away_since löschen, erst die Lücke berechnen
-        start = (
-            self._away_since
-            or self._bg_since
-            or getattr(self, "_last_frame_wall", now)
-        )
+        # Nur echte Hintergrund-Zeitstempel verwenden
+        start = self._away_since or self._bg_since
+        if start is not None:
+            gap = max(0.0, now - start)
+        else:
+            # Kein Zeitstempel -> Fallback über raw_dt im Hauptloop
+            gap = 0.0
 
-        gap = max(0.0, now - start) if start else 0.0
-
-        # Alte Hintergrund-Alarme direkt canceln
         self._cancel_pet_alarm()
 
-        # Offline-Simulation für den Hauptloop vormerken.
-        # Wenn du wirklich JEDEN Foreground simulieren willst, lass gap > 0.0 so stehen.
-        # Falls du nur "echte" Abwesenheit willst, ändere es auf:
-        # if gap > OFFLINE_DT_MIN and self.pet ...
         if gap > 0.0 and self.pet and self.pet.state not in (STATE_DEAD, STATE_GHOST):
             self._pending_offline_seconds = min(gap, OFFLINE_MAX)
         else:
             self._pending_offline_seconds = 0.0
 
-        # Jetzt können die Zeitstempel zurückgesetzt werden
         self._away_since = None
         self._bg_since = None
 
-        # Musik wieder aktivieren
         try:
             if self.music_on:
                 pygame.mixer.music.unpause()
         except Exception:
             pass
 
-        # Cooldown zurücksetzen, wenn lange genug weg
         if gap >= NOTIF_COOLDOWN:
             self._last_notif_time = 0.0
             print(f"[notif] Cooldown zurückgesetzt (bg {gap:.0f}s)")
 
-        # Android-Notification-Permission neu prüfen
         if platform() == "android":
             try:
                 from android.permissions import check_permission
@@ -2892,18 +2880,24 @@ class Game:
             self.mode = "game"
             self.notifications_on = bool(data.get("notifications_on", True))
             saved_at = data.get("saved_at")
-            self._last_notif_time = data.get("last_notif", 0.0)
-            elapsed = (time.time() - saved_at) if saved_at else 0.0
             away = data.get("away_since")
-            report_secs = (time.time() - away) if away else elapsed
+            self._last_notif_time = data.get("last_notif", 0.0)
+
+            # Referenzzeit: away_since hat Vorrang vor saved_at
+            ref_time = away if away else saved_at
+            elapsed = (time.time() - ref_time) if ref_time else 0.0
+
             if (elapsed > 60
                     and self.pet.state not in (STATE_DEAD, STATE_GHOST)):
                 gap = min(elapsed, OFFLINE_MAX)
                 self.offline_report = self.pet.simulate_offline(gap)
-                self.offline_report["secs"] = min(report_secs, OFFLINE_MAX)
+                self.offline_report["secs"] = gap
                 self.mode = "offline"
                 print(f"[offline] {gap / 60:.0f} min simuliert")
-                self.save()      # saved_at auffrischen -> keine Doppel-Sim
+                self._away_since = None
+                self.save()
+            else:
+                self._away_since = None
             return True
         except Exception as e:
             print(f"[load] Save-Fehler: {e}")
